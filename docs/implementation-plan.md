@@ -15,14 +15,16 @@
 
 ## Этап 0 — Подготовка + скелет CI
 
-**Статус:** не начато
+**Статус:** в процессе
 
-1. Установить Flutter SDK, `flutter doctor` до зелёных галочек (Android Studio + Xcode, если Mac — для сборки под обе платформы).
-2. `flutter create` проекта, сразу подключить пакеты: `supabase_flutter` (бэкенд), `go_router` (навигация), `riverpod` (state management — проще для новичка, чем BLoC, и не так «магично», как Provider).
-3. Создать проект в Supabase, включить Auth (email/password), сразу создать бакет в Storage под фото/аватары.
-4. Секреты (Supabase URL/anon key) — через `--dart-define` или `flutter_dotenv`, `.env` в `.gitignore` сразу, чтобы не закоммитить ключи.
-5. Репозиторий на GitHub.
-6. **CI сразу, пока код ещё простой:** GitHub Actions workflow на каждый push/PR — `flutter analyze`, `dart format --set-exit-if-changed`, `flutter test`. Минимальный, но с первого коммита — потом дороже будет чинить накопившиеся ворнинги.
+1. ✅ Flutter SDK установлен — **версия закреплена на 3.32.8**: последняя (3.44.x) требует macOS 14+, а на этой машине macOS 12.7.6 (Monterey). Более новые версии ставить нельзя, пока не обновится macOS. SDK лежит в `~/development/flutter`, добавлен в PATH через `~/.zshrc`.
+   - ⏳ Android toolchain: Android Studio установлен, но `cmdline-tools` нужно доустановить вручную (Settings → Languages & Frameworks → Android SDK → SDK Tools → «Android SDK Command-line Tools»), после чего принять лицензии (`flutter doctor --android-licenses`).
+   - ⏸️ Xcode: не устанавливается — решено делать сначала только Android, iOS отложен до обновления macOS (см. project-brief.md).
+2. ✅ `flutter create --platforms=android,ios` в `app/` (org `com.github.tiltozavr2545`), подключены `supabase_flutter`, `go_router`, `flutter_riverpod`, `cached_network_image`.
+3. ⏳ Supabase: проект ещё не создан — требует ручной регистрации в браузере.
+4. ✅ `.env` в `.gitignore` (с исключением `.env.example` как шаблона), сам Supabase URL/anon key появятся после пункта 3.
+5. ✅ Репозиторий на GitHub: [github.com/tiltozavr2545/lk-system](https://github.com/tiltozavr2545/lk-system) (публичный).
+6. ✅ CI: `.github/workflows/ci.yml` — `dart format`, `flutter analyze`, `flutter test` на каждый push/PR, первый прогон прошёл успешно.
 
 ## Этап 1 — Auth + профиль
 
@@ -88,5 +90,8 @@
 - **Кеширование картинок:** cached_network_image
 - **Версионирование схемы БД:** Supabase CLI migrations (не ручные правки в дашборде)
 - **Линтинг/форматирование:** flutter_lints + `dart format`, проверяются в CI с первого коммита
+- **Структура репозитория:** `docs/` — планирование, `app/` — Flutter-проект (org `com.github.tiltozavr2545`, имя пакета `krug`)
+- **Репозиторий:** [github.com/tiltozavr2545/lk-system](https://github.com/tiltozavr2545/lk-system) (публичный)
+- **Версия Flutter:** закреплена на 3.32.8 (SDK в `~/development/flutter`) — новее нельзя, пока dev-машина на macOS 12; при обновлении macOS до 14+ можно снять пин и перейти на актуальную стабильную версию
 
 Отклонения от этого списка (например, замена Riverpod на что-то другое) стоит фиксировать здесь, чтобы не расходиться с планом без причины.
