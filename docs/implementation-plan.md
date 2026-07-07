@@ -4,7 +4,7 @@
 
 ## Прогресс
 
-- [ ] Этап 0 — Подготовка + скелет CI
+- [x] Этап 0 — Подготовка + скелет CI
 - [ ] Этап 1 — Auth + профиль
 - [ ] Этап 2 — Connections (знакомства)
 - [ ] Этап 3 — Общая лента
@@ -15,14 +15,14 @@
 
 ## Этап 0 — Подготовка + скелет CI
 
-**Статус:** в процессе
+**Статус:** сделано
 
 1. ✅ Flutter SDK установлен — **версия закреплена на 3.32.8**: последняя (3.44.x) требует macOS 14+, а на этой машине macOS 12.7.6 (Monterey). Более новые версии ставить нельзя, пока не обновится macOS. SDK лежит в `~/development/flutter`, добавлен в PATH через `~/.zshrc`.
-   - ⏳ Android toolchain: Android Studio установлен, но `cmdline-tools` нужно доустановить вручную (Settings → Languages & Frameworks → Android SDK → SDK Tools → «Android SDK Command-line Tools»), после чего принять лицензии (`flutter doctor --android-licenses`).
+   - ✅ Android toolchain: Android Studio + cmdline-tools установлены, лицензии приняты, `flutter doctor` зелёный по Android.
    - ⏸️ Xcode: не устанавливается — решено делать сначала только Android, iOS отложен до обновления macOS (см. project-brief.md).
 2. ✅ `flutter create --platforms=android,ios` в `app/` (org `com.github.tiltozavr2545`), подключены `supabase_flutter`, `go_router`, `flutter_riverpod`, `cached_network_image`.
-3. ⏳ Supabase: проект ещё не создан — требует ручной регистрации в браузере.
-4. ✅ `.env` в `.gitignore` (с исключением `.env.example` как шаблона), сам Supabase URL/anon key появятся после пункта 3.
+3. ✅ Supabase: проект `lk-system` создан, Auth (email/password) включён, Storage bucket `media` создан (приватный, политики доступа настроим на Этапе 1/3).
+4. ✅ `.env` заполнен (`SUPABASE_URL`, `SUPABASE_ANON_KEY` — используется Publishable key), в `.gitignore` (с исключением `.env.example` как шаблона).
 5. ✅ Репозиторий на GitHub: [github.com/tiltozavr2545/lk-system](https://github.com/tiltozavr2545/lk-system) (публичный).
 6. ✅ CI: `.github/workflows/ci.yml` — `dart format`, `flutter analyze`, `flutter test` на каждый push/PR, первый прогон прошёл успешно.
 
@@ -93,5 +93,6 @@
 - **Структура репозитория:** `docs/` — планирование, `app/` — Flutter-проект (org `com.github.tiltozavr2545`, имя пакета `krug`)
 - **Репозиторий:** [github.com/tiltozavr2545/lk-system](https://github.com/tiltozavr2545/lk-system) (публичный)
 - **Версия Flutter:** закреплена на 3.32.8 (SDK в `~/development/flutter`) — новее нельзя, пока dev-машина на macOS 12; при обновлении macOS до 14+ можно снять пин и перейти на актуальную стабильную версию
+- **Supabase API keys:** используется новый формат (Publishable/Secret вместо legacy anon/service_role) — в `SUPABASE_ANON_KEY` кладём именно Publishable key (`sb_publishable_...`); Secret key нигде в клиентском коде не используется
 
 Отклонения от этого списка (например, замена Riverpod на что-то другое) стоит фиксировать здесь, чтобы не расходиться с планом без причины.
