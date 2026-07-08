@@ -17,6 +17,7 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
 
   String? _myInviteCode;
   bool _isCreatingLink = false;
+  String? _createLinkError;
 
   bool _isActivating = false;
   String? _activationMessage;
@@ -29,12 +30,17 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
   }
 
   Future<void> _createInviteLink() async {
-    setState(() => _isCreatingLink = true);
+    setState(() {
+      _isCreatingLink = true;
+      _createLinkError = null;
+    });
     try {
       final code = await ref
           .read(connectionsRepositoryProvider)
           .createInviteLink();
       setState(() => _myInviteCode = code);
+    } catch (e) {
+      setState(() => _createLinkError = 'Неожиданная ошибка: $e');
     } finally {
       if (mounted) setState(() => _isCreatingLink = false);
     }
@@ -57,6 +63,11 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
       setState(() {
         _activationSucceeded = false;
         _activationMessage = e.message;
+      });
+    } catch (e) {
+      setState(() {
+        _activationSucceeded = false;
+        _activationMessage = 'Неожиданная ошибка: $e';
       });
     } finally {
       if (mounted) setState(() => _isActivating = false);
@@ -94,6 +105,13 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
               ],
             ),
           const SizedBox(height: 8),
+          if (_createLinkError != null) ...[
+            Text(
+              _createLinkError!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            const SizedBox(height: 8),
+          ],
           FilledButton(
             onPressed: _isCreatingLink ? null : _createInviteLink,
             child: _isCreatingLink

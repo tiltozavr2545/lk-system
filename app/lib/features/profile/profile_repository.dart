@@ -28,16 +28,6 @@ class ProfileRepository {
 
   final SupabaseClient _client;
 
-  Future<void> createProfile({
-    required String userId,
-    required String name,
-  }) async {
-    await _client.from('users').insert({
-      'id': userId,
-      'name': name.isEmpty ? 'Без имени' : name,
-    });
-  }
-
   Future<Profile> fetchProfile(String userId) async {
     final row = await _client.from('users').select().eq('id', userId).single();
     return Profile.fromRow(row);

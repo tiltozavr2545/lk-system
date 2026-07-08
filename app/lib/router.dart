@@ -17,7 +17,14 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     refreshListenable: _GoRouterRefreshStream(authChanges),
     redirect: (context, state) {
-      final loggedIn = ref.read(currentUserIdProvider) != null;
+      // Read the session straight off the SDK client rather than through
+      // currentUserIdProvider: that provider only recomputes once Riverpod's
+      // own subscription to authStateChangesProvider fires, which can lose
+      // a race against this callback (triggered by our own separate
+      // subscription in _GoRouterRefreshStream below) and read a stale
+      // cached value.
+      final loggedIn =
+          ref.read(supabaseClientProvider).auth.currentSession != null;
       final onAuthScreen =
           state.matchedLocation == '/sign-in' ||
           state.matchedLocation == '/sign-up';

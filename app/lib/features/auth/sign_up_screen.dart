@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../profile/profile_repository.dart';
 import 'auth_providers.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -35,19 +34,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     });
     try {
       final client = ref.read(supabaseClientProvider);
-      final response = await client.auth.signUp(
+      // The public.users row is created by a database trigger on
+      // auth.users insert (see handle_new_user()) — it reads the name back
+      // out of this metadata. Doing it this way means the profile exists
+      // even when email confirmation is pending and no session/JWT exists
+      // yet for a client-side insert.
+      await client.auth.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
+        data: {'name': _nameController.text.trim()},
       );
-      final userId = response.user?.id;
-      if (userId == null) {
-        throw const AuthException('Не удалось создать пользователя');
-      }
-      await ref
-          .read(profileRepositoryProvider)
-          .createProfile(userId: userId, name: _nameController.text.trim());
     } on AuthException catch (e) {
       setState(() => _errorMessage = e.message);
+    } catch (e) {
+      setState(() => _errorMessage = 'Неожиданная ошибка: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

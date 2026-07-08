@@ -40,6 +40,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           );
     } on AuthException catch (e) {
       setState(() => _errorMessage = e.message);
+    } catch (e) {
+      setState(() => _errorMessage = 'Неожиданная ошибка: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

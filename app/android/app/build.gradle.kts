@@ -8,7 +8,9 @@ plugins {
 android {
     namespace = "com.github.tiltozavr2545.krug"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Pinned above flutter.ndkVersion (26.x): several plugins (app_links,
+    // image_picker_android, etc.) require 27.0.12077973.
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
