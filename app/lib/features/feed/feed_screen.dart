@@ -135,10 +135,19 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                       child: Text(_errorMessage!),
                     )
                   else
-                    const Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text(
-                        'Пока нет постов от знакомых. Добавь знакомых или напиши первым.',
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Пока нет постов от знакомых. Добавь знакомых или напиши первым.',
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton(
+                            onPressed: () => context.push('/connections'),
+                            child: const Text('Добавить знакомых'),
+                          ),
+                        ],
                       ),
                     ),
                 ],
