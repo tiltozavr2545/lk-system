@@ -23,7 +23,7 @@
 2. ✅ `flutter create --platforms=android,ios` в `app/` (org `com.github.tiltozavr2545`), подключены `supabase_flutter`, `go_router`, `flutter_riverpod`, `cached_network_image`.
 3. ✅ Supabase: проект `lk-system` создан, Auth (email/password) включён, Storage bucket `media` создан (приватный, политики доступа настроим на Этапе 1/3).
 4. ✅ `.env` заполнен (`SUPABASE_URL`, `SUPABASE_ANON_KEY` — используется Publishable key), в `.gitignore` (с исключением `.env.example` как шаблона).
-5. ✅ Репозиторий на GitHub: [github.com/tiltozavr2545/lk-system](https://github.com/tiltozavr2545/lk-system) (публичный).
+5. ✅ Репозиторий на GitHub: [github.com/tiltozavr2545/amicus](https://github.com/tiltozavr2545/amicus) (публичный).
 6. ✅ CI: `.github/workflows/ci.yml` — `dart format`, `flutter analyze`, `flutter test` на каждый push/PR, первый прогон прошёл успешно.
 
 ## Этап 1 — Auth + профиль
@@ -101,7 +101,7 @@
 - **Линтинг/форматирование:** flutter_lints + `dart format`, проверяются в CI с первого коммита
 - **Структура репозитория:** `docs/` — планирование, `app/` — Flutter-проект (org `com.github.tiltozavr2545`, имя пакета `amicus`)
 - **Название проекта:** Amicus (переименовано с рабочего «Круг» после старта разработки — см. project-brief.md)
-- **Репозиторий:** [github.com/tiltozavr2545/lk-system](https://github.com/tiltozavr2545/lk-system) (публичный)
+- **Репозиторий:** [github.com/tiltozavr2545/amicus](https://github.com/tiltozavr2545/amicus) (публичный)
 - **Версия Flutter:** закреплена на 3.32.8 (SDK в `~/development/flutter`) — новее нельзя, пока dev-машина на macOS 12; при обновлении macOS до 14+ можно снять пин и перейти на актуальную стабильную версию
 - **Supabase API keys:** используется новый формат (Publishable/Secret вместо legacy anon/service_role) — в `SUPABASE_ANON_KEY` кладём именно Publishable key (`sb_publishable_...`); Secret key нигде в клиентском коде не используется
 
