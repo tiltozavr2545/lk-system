@@ -25,13 +25,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       // cached value.
       final loggedIn =
           ref.read(supabaseClientProvider).auth.currentSession != null;
-      final onAuthScreen =
-          state.matchedLocation == '/sign-in' ||
-          state.matchedLocation == '/sign-up';
-
-      if (!loggedIn && !onAuthScreen) return '/sign-in';
-      if (loggedIn && onAuthScreen) return '/';
-      return null;
+      return computeRedirect(
+        loggedIn: loggedIn,
+        location: state.matchedLocation,
+      );
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const ProfileScreen()),
@@ -50,6 +47,16 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// Where `redirect` should send the user, or `null` to stay put. A pure
+/// function so the decision table can be unit tested without a router,
+/// Supabase client, or BuildContext.
+String? computeRedirect({required bool loggedIn, required String location}) {
+  final onAuthScreen = location == '/sign-in' || location == '/sign-up';
+  if (!loggedIn && !onAuthScreen) return '/sign-in';
+  if (loggedIn && onAuthScreen) return '/';
+  return null;
+}
 
 /// Bridges a Stream to Listenable so GoRouter can re-evaluate `redirect`
 /// whenever the auth state changes.
