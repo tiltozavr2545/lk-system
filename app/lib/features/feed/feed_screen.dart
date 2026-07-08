@@ -76,6 +76,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         title: const Text('Круг'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.people_outline),
+            tooltip: 'Знакомства',
+            onPressed: () => context.push('/connections'),
+          ),
+          IconButton(
             icon: const Icon(Icons.person_outline),
             tooltip: 'Профиль',
             onPressed: () => context.push('/profile'),
@@ -95,6 +100,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         onRefresh: _refresh,
         child: _posts.isEmpty && !_isLoading
             ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   if (_errorMessage != null)
                     Padding(
@@ -112,6 +118,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               )
             : ListView.separated(
                 controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 itemCount: _posts.length + 1,
                 separatorBuilder: (context, index) =>

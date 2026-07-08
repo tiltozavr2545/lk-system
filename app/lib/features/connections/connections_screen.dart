@@ -3,7 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../auth/auth_providers.dart';
 import 'connections_repository.dart';
+
+final _friendsProvider = FutureProvider.autoDispose<List<Friend>>((ref) {
+  final userId = ref.watch(currentUserIdProvider);
+  return ref.watch(connectionsRepositoryProvider).fetchFriends(userId!);
+});
 
 class ConnectionsScreen extends ConsumerStatefulWidget {
   const ConnectionsScreen({super.key});
@@ -59,6 +65,7 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
         _activationSucceeded = true;
         _activationMessage = 'Вы теперь знакомы с ${connection.ownerName}';
       });
+      ref.invalidate(_friendsProvider);
     } on PostgrestException catch (e) {
       setState(() {
         _activationSucceeded = false;
@@ -76,6 +83,8 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final friendsAsync = ref.watch(_friendsProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Знакомства')),
       body: ListView(
@@ -157,6 +166,31 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Text('Активировать'),
+          ),
+          const SizedBox(height: 32),
+          Text('Мои знакомые', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          friendsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) =>
+                Text('Не удалось загрузить список: $error'),
+            data: (friends) => friends.isEmpty
+                ? const Text(
+                    'Пока нет знакомых — активируй код или создай свой выше',
+                  )
+                : Column(
+                    children: friends
+                        .map(
+                          (friend) => ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                            title: Text(friend.name),
+                          ),
+                        )
+                        .toList(),
+                  ),
           ),
         ],
       ),

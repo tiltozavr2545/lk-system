@@ -10,6 +10,13 @@ class ActivatedConnection {
   final String ownerName;
 }
 
+class Friend {
+  const Friend({required this.userId, required this.name});
+
+  final String userId;
+  final String name;
+}
+
 class ConnectionsRepository {
   ConnectionsRepository(this._client);
 
@@ -29,6 +36,29 @@ class ConnectionsRepository {
       ownerId: row['owner_id'] as String,
       ownerName: row['owner_name'] as String,
     );
+  }
+
+  Future<List<Friend>> fetchFriends(String currentUserId) async {
+    final rows = await _client
+        .from('connections')
+        .select(
+          'user_a_id, user_b_id, '
+          'user_a:users!connections_user_a_id_fkey(name), '
+          'user_b:users!connections_user_b_id_fkey(name)',
+        )
+        .or('user_a_id.eq.$currentUserId,user_b_id.eq.$currentUserId')
+        .order('created_at', ascending: false);
+
+    return rows.map((row) {
+      final isCurrentUserA = row['user_a_id'] == currentUserId;
+      final otherId = isCurrentUserA
+          ? row['user_b_id'] as String
+          : row['user_a_id'] as String;
+      final otherName =
+          (isCurrentUserA ? row['user_b'] : row['user_a'])
+              as Map<String, dynamic>;
+      return Friend(userId: otherId, name: otherName['name'] as String);
+    }).toList();
   }
 }
 
