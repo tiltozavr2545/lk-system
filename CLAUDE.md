@@ -10,7 +10,7 @@
 
 ## Статус
 
-Этап 0 завершён (см. [docs/implementation-plan.md](docs/implementation-plan.md)). Flutter-проект в `app/`, репозиторий на GitHub, CI зелёный, Supabase-проект создан (Auth + Storage bucket `media`). Следующий шаг — Этап 1 (Auth-экраны, таблица `users`, RLS).
+Этапы 0 и 1 завершены (см. [docs/implementation-plan.md](docs/implementation-plan.md)). Есть экраны входа/регистрации, профиль с загрузкой аватара, таблица `users` с RLS, CI зелёный. Следующий шаг — Этап 2 (Connections: invite-ссылки).
 
 **Важно:** dev-машина на macOS 12.7.6 — версии Flutter новее 3.32.8 не запускаются (нужен macOS 14+). SDK закреплён на 3.32.8. iOS-разработка отложена (нужен Xcode, который тоже требует более новую macOS) — пока только Android.
 
