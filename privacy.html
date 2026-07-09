@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amicus — политика конфиденциальности</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f2fa;
+    color: #1c1b1f;
+    line-height: 1.6;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1c1b1f; color: #eee0ff; }
+    .card { background: #2a2735 !important; }
+  }
+  .card {
+    max-width: 680px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  h1 { font-size: 24px; margin-top: 0; }
+  h2 { font-size: 18px; margin-top: 32px; }
+  p, li { font-size: 15px; opacity: 0.9; }
+  a { color: #623aa2; }
+  ul { padding-left: 20px; }
+  .updated { font-size: 13px; opacity: 0.6; margin-top: 40px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Amicus — политика конфиденциальности</h1>
+    <p>Amicus — приложение-соцсеть, в котором лента пользователя показывает посты только тех, с кем есть подтверждённое знакомство. Это пилотный проект, находящийся на стадии закрытого бета-тестирования.</p>
+
+    <h2>Какие данные собираются</h2>
+    <ul>
+      <li>Email и пароль — для регистрации и входа (пароль хранится в хешированном виде, приложение его не видит).</li>
+      <li>Имя — указывается при регистрации, видно другим пользователям приложения.</li>
+      <li>Фото профиля (аватар) — по желанию.</li>
+      <li>Текст и фото постов, комментариев — то, что вы сами публикуете.</li>
+      <li>Лайки — какие посты вы отметили.</li>
+    </ul>
+
+    <h2>Как данные используются</h2>
+    <p>Данные используются исключительно для работы приложения: показать вашу ленту, ваш профиль и профили знакомых, ваши посты — тем, с кем у вас подтверждено знакомство через invite-ссылку. Данные не передаются третьим лицам, не продаются, не используются для рекламы (рекламы в приложении нет).</p>
+
+    <h2>Где хранятся данные</h2>
+    <p>Данные хранятся у облачного провайдера <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> (PostgreSQL + Storage), с ограничением доступа на уровне базы данных (Row Level Security) — то есть пост виден в базе только тем, кто имеет право его увидеть, даже без участия кода приложения.</p>
+
+    <h2>Удаление данных</h2>
+    <p>Чтобы удалить свой аккаунт и все связанные данные, напишите на <a href="mailto:toptim2545@gmail.com">toptim2545@gmail.com</a>.</p>
+
+    <h2>Дети</h2>
+    <p>Приложение не предназначено для детей младше 13 лет и не собирает данные целенаправленно у этой аудитории.</p>
+
+    <h2>Контакты</h2>
+    <p>По вопросам, связанным с этой политикой, пишите на <a href="mailto:toptim2545@gmail.com">toptim2545@gmail.com</a>.</p>
+
+    <p class="updated">Обновлено: 9 июля 2026</p>
+  </div>
+</body>
+</html>
