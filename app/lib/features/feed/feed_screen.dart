@@ -109,26 +109,58 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     }
   }
 
-  Future<void> _toggleLike(int index) async {
+  /// Tapping a reaction toggles it: tapping the one you already have clears it,
+  /// tapping a different one switches to it. Applied optimistically, rolled
+  /// back on error.
+  Future<void> _react(int index, ReactionType type) async {
     final post = _posts[index];
     final userId = ref.read(supabaseClientProvider).auth.currentUser!.id;
-    final wasLiked = post.likedByMe;
-    setState(() {
-      _posts[index] = post.copyWith(
-        likedByMe: !wasLiked,
-        likeCount: post.likeCount + (wasLiked ? -1 : 1),
-      );
-    });
+    final next = post.myReaction == type ? null : type;
+    setState(() => _posts[index] = _applyReaction(post, next));
     try {
       final repo = ref.read(feedRepositoryProvider);
-      if (wasLiked) {
-        await repo.unlike(postId: post.id, userId: userId);
+      if (next == null) {
+        await repo.removeReaction(postId: post.id, userId: userId);
       } else {
-        await repo.like(postId: post.id, userId: userId);
+        await repo.setReaction(postId: post.id, userId: userId, type: next);
       }
     } catch (_) {
       if (mounted) setState(() => _posts[index] = post);
     }
+  }
+
+  /// Returns [post] with its counts and `myReaction` adjusted from the current
+  /// reaction to [next] (null = no reaction).
+  Post _applyReaction(Post post, ReactionType? next) {
+    var like = post.likeCount;
+    var neutral = post.neutralCount;
+    var dislike = post.dislikeCount;
+    switch (post.myReaction) {
+      case ReactionType.like:
+        like--;
+      case ReactionType.neutral:
+        neutral--;
+      case ReactionType.dislike:
+        dislike--;
+      case null:
+        break;
+    }
+    switch (next) {
+      case ReactionType.like:
+        like++;
+      case ReactionType.neutral:
+        neutral++;
+      case ReactionType.dislike:
+        dislike++;
+      case null:
+        break;
+    }
+    return post.copyWith(
+      likeCount: like,
+      neutralCount: neutral,
+      dislikeCount: dislike,
+      myReaction: next,
+    );
   }
 
   @override
@@ -214,7 +246,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                   return _PostCard(
                     post: post,
                     isOwnPost: post.authorId == currentUserId,
-                    onToggleLike: () => _toggleLike(index),
+                    onReact: (type) => _react(index, type),
                     onDelete: () => _deletePost(index),
                     onOpenComments: () => Navigator.of(context).push(
                       MaterialPageRoute(
@@ -233,14 +265,14 @@ class _PostCard extends StatelessWidget {
   const _PostCard({
     required this.post,
     required this.isOwnPost,
-    required this.onToggleLike,
+    required this.onReact,
     required this.onDelete,
     required this.onOpenComments,
   });
 
   final Post post;
   final bool isOwnPost;
-  final VoidCallback onToggleLike;
+  final ValueChanged<ReactionType> onReact;
   final VoidCallback onDelete;
   final VoidCallback onOpenComments;
 
@@ -293,17 +325,37 @@ class _PostCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    post.likedByMe ? Icons.favorite : Icons.favorite_border,
-                  ),
-                  color: post.likedByMe ? Colors.red : null,
-                  onPressed: onToggleLike,
+                _ReactionButton(
+                  selectedIcon: Icons.thumb_up,
+                  unselectedIcon: Icons.thumb_up_outlined,
+                  color: Colors.green,
+                  tooltip: 'Нравится',
+                  count: post.likeCount,
+                  selected: post.myReaction == ReactionType.like,
+                  onPressed: () => onReact(ReactionType.like),
                 ),
-                Text('${post.likeCount}'),
-                const SizedBox(width: 16),
+                _ReactionButton(
+                  selectedIcon: Icons.sentiment_neutral,
+                  unselectedIcon: Icons.sentiment_neutral_outlined,
+                  color: Colors.amber,
+                  tooltip: 'Нейтрально',
+                  count: post.neutralCount,
+                  selected: post.myReaction == ReactionType.neutral,
+                  onPressed: () => onReact(ReactionType.neutral),
+                ),
+                _ReactionButton(
+                  selectedIcon: Icons.thumb_down,
+                  unselectedIcon: Icons.thumb_down_outlined,
+                  color: Colors.red,
+                  tooltip: 'Не нравится',
+                  count: post.dislikeCount,
+                  selected: post.myReaction == ReactionType.dislike,
+                  onPressed: () => onReact(ReactionType.dislike),
+                ),
+                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.mode_comment_outlined),
+                  visualDensity: VisualDensity.compact,
                   onPressed: onOpenComments,
                 ),
                 Text('${post.commentCount}'),
@@ -312,6 +364,43 @@ class _PostCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ReactionButton extends StatelessWidget {
+  const _ReactionButton({
+    required this.selectedIcon,
+    required this.unselectedIcon,
+    required this.color,
+    required this.tooltip,
+    required this.count,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  final IconData selectedIcon;
+  final IconData unselectedIcon;
+  final Color color;
+  final String tooltip;
+  final int count;
+  final bool selected;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: Icon(selected ? selectedIcon : unselectedIcon),
+          color: selected ? color : null,
+          tooltip: tooltip,
+          visualDensity: VisualDensity.compact,
+          onPressed: onPressed,
+        ),
+        Text('$count'),
+      ],
     );
   }
 }

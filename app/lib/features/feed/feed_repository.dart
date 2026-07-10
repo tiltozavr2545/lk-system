@@ -5,6 +5,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../auth/auth_providers.dart';
 
+/// The three mutually-exclusive reactions a user can leave on a post. Stored
+/// in `reactions.type` as the enum's [name] (`like` / `neutral` / `dislike`).
+enum ReactionType {
+  like,
+  neutral,
+  dislike;
+
+  static ReactionType fromDb(String value) => ReactionType.values.byName(value);
+
+  String get dbValue => name;
+}
+
+/// Sentinel so [Post.copyWith] can tell "leave myReaction unchanged" apart
+/// from "clear it to null" — a plain nullable parameter can't express both.
+const Object _unchanged = Object();
+
 class Post {
   const Post({
     required this.id,
@@ -15,7 +31,9 @@ class Post {
     this.imagePath,
     this.imageUrl,
     this.likeCount = 0,
-    this.likedByMe = false,
+    this.neutralCount = 0,
+    this.dislikeCount = 0,
+    this.myReaction,
     this.commentCount = 0,
   });
 
@@ -27,7 +45,11 @@ class Post {
   final String? imagePath;
   final String? imageUrl;
   final int likeCount;
-  final bool likedByMe;
+  final int neutralCount;
+  final int dislikeCount;
+
+  /// The current user's reaction on this post, or null if they haven't reacted.
+  final ReactionType? myReaction;
   final int commentCount;
 
   factory Post.fromRow(Map<String, dynamic> row) {
@@ -44,7 +66,9 @@ class Post {
   Post copyWith({
     String? imageUrl,
     int? likeCount,
-    bool? likedByMe,
+    int? neutralCount,
+    int? dislikeCount,
+    Object? myReaction = _unchanged,
     int? commentCount,
   }) {
     return Post(
@@ -56,7 +80,11 @@ class Post {
       imagePath: imagePath,
       imageUrl: imageUrl ?? this.imageUrl,
       likeCount: likeCount ?? this.likeCount,
-      likedByMe: likedByMe ?? this.likedByMe,
+      neutralCount: neutralCount ?? this.neutralCount,
+      dislikeCount: dislikeCount ?? this.dislikeCount,
+      myReaction: identical(myReaction, _unchanged)
+          ? this.myReaction
+          : myReaction as ReactionType?,
       commentCount: commentCount ?? this.commentCount,
     );
   }
@@ -118,7 +146,7 @@ class FeedRepository {
 
     final reactionRows = await _client
         .from('reactions')
-        .select('post_id, user_id')
+        .select('post_id, user_id, type')
         .inFilter('post_id', postIds);
     final commentRows = await _client
         .from('comments')
@@ -126,11 +154,21 @@ class FeedRepository {
         .inFilter('post_id', postIds);
 
     final likeCounts = <String, int>{};
-    final likedByMe = <String>{};
+    final neutralCounts = <String, int>{};
+    final dislikeCounts = <String, int>{};
+    final myReactions = <String, ReactionType>{};
     for (final row in reactionRows) {
       final postId = row['post_id'] as String;
-      likeCounts[postId] = (likeCounts[postId] ?? 0) + 1;
-      if (row['user_id'] == currentUserId) likedByMe.add(postId);
+      final type = ReactionType.fromDb(row['type'] as String);
+      switch (type) {
+        case ReactionType.like:
+          likeCounts[postId] = (likeCounts[postId] ?? 0) + 1;
+        case ReactionType.neutral:
+          neutralCounts[postId] = (neutralCounts[postId] ?? 0) + 1;
+        case ReactionType.dislike:
+          dislikeCounts[postId] = (dislikeCounts[postId] ?? 0) + 1;
+      }
+      if (row['user_id'] == currentUserId) myReactions[postId] = type;
     }
 
     final commentCounts = <String, int>{};
@@ -143,7 +181,9 @@ class FeedRepository {
         .map(
           (post) => post.copyWith(
             likeCount: likeCounts[post.id] ?? 0,
-            likedByMe: likedByMe.contains(post.id),
+            neutralCount: neutralCounts[post.id] ?? 0,
+            dislikeCount: dislikeCounts[post.id] ?? 0,
+            myReaction: myReactions[post.id],
             commentCount: commentCounts[post.id] ?? 0,
           ),
         )
@@ -180,14 +220,25 @@ class FeedRepository {
     });
   }
 
-  Future<void> like({required String postId, required String userId}) async {
-    await _client.from('reactions').insert({
+  /// Sets (or switches) the current user's reaction on a post. Upserts onto
+  /// the unique (post_id, user_id) row, so switching like -> dislike replaces
+  /// the type rather than adding a second reaction.
+  Future<void> setReaction({
+    required String postId,
+    required String userId,
+    required ReactionType type,
+  }) async {
+    await _client.from('reactions').upsert({
       'post_id': postId,
       'user_id': userId,
-    });
+      'type': type.dbValue,
+    }, onConflict: 'post_id, user_id');
   }
 
-  Future<void> unlike({required String postId, required String userId}) async {
+  Future<void> removeReaction({
+    required String postId,
+    required String userId,
+  }) async {
     await _client
         .from('reactions')
         .delete()
