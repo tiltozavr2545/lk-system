@@ -74,6 +74,41 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     await _loadMore();
   }
 
+  Future<void> _deletePost(int index) async {
+    final post = _posts[index];
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Удалить пост?'),
+        content: const Text('Пост, фото и комментарии к нему будут удалены.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await ref
+          .read(feedRepositoryProvider)
+          .deletePost(postId: post.id, imagePath: post.imagePath);
+      if (mounted) setState(() => _posts.removeAt(index));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Не удалось удалить пост: $e')));
+      }
+    }
+  }
+
   Future<void> _toggleLike(int index) async {
     final post = _posts[index];
     final userId = ref.read(supabaseClientProvider).auth.currentUser!.id;
@@ -171,9 +206,16 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         : const SizedBox.shrink();
                   }
                   final post = _posts[index];
+                  final currentUserId = ref
+                      .read(supabaseClientProvider)
+                      .auth
+                      .currentUser!
+                      .id;
                   return _PostCard(
                     post: post,
+                    isOwnPost: post.authorId == currentUserId,
                     onToggleLike: () => _toggleLike(index),
+                    onDelete: () => _deletePost(index),
                     onOpenComments: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => CommentsScreen(postId: post.id),
@@ -190,12 +232,16 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 class _PostCard extends StatelessWidget {
   const _PostCard({
     required this.post,
+    required this.isOwnPost,
     required this.onToggleLike,
+    required this.onDelete,
     required this.onOpenComments,
   });
 
   final Post post;
+  final bool isOwnPost;
   final VoidCallback onToggleLike;
+  final VoidCallback onDelete;
   final VoidCallback onOpenComments;
 
   @override
@@ -206,9 +252,25 @@ class _PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              post.authorName,
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    post.authorName,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (isOwnPost)
+                  PopupMenuButton<void>(
+                    icon: const Icon(Icons.more_vert),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: onDelete,
+                        child: const Text('Удалить'),
+                      ),
+                    ],
+                  ),
+              ],
             ),
             Text(
               DateFormat('d MMM y, HH:mm').format(post.createdAt),

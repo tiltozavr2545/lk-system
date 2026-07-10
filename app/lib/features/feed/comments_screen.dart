@@ -43,6 +43,38 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
     }
   }
 
+  Future<void> _deleteComment(int index) async {
+    final comment = _comments![index];
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Удалить комментарий?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(feedRepositoryProvider).deleteComment(comment.id);
+      if (mounted) setState(() => _comments!.removeAt(index));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Не удалось удалить комментарий: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _send() async {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
@@ -80,22 +112,45 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
                     itemCount: _comments!.length,
                     itemBuilder: (context, index) {
                       final comment = _comments![index];
+                      final currentUserId = ref
+                          .read(supabaseClientProvider)
+                          .auth
+                          .currentUser!
+                          .id;
+                      final isOwnComment = comment.authorId == currentUserId;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: Column(
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              comment.authorName,
-                              style: Theme.of(context).textTheme.titleSmall,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    comment.authorName,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleSmall,
+                                  ),
+                                  Text(comment.text),
+                                  Text(
+                                    DateFormat(
+                                      'd MMM y, HH:mm',
+                                    ).format(comment.createdAt),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(comment.text),
-                            Text(
-                              DateFormat(
-                                'd MMM y, HH:mm',
-                              ).format(comment.createdAt),
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
+                            if (isOwnComment)
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                iconSize: 20,
+                                onPressed: () => _deleteComment(index),
+                              ),
                           ],
                         ),
                       );

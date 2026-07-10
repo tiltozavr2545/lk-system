@@ -12,6 +12,7 @@ class Post {
     required this.authorName,
     required this.createdAt,
     this.text,
+    this.imagePath,
     this.imageUrl,
     this.likeCount = 0,
     this.likedByMe = false,
@@ -23,6 +24,7 @@ class Post {
   final String authorName;
   final DateTime createdAt;
   final String? text;
+  final String? imagePath;
   final String? imageUrl;
   final int likeCount;
   final bool likedByMe;
@@ -35,6 +37,7 @@ class Post {
       authorName: (row['author'] as Map<String, dynamic>)['name'] as String,
       createdAt: DateTime.parse(row['created_at'] as String),
       text: row['text'] as String?,
+      imagePath: row['image_path'] as String?,
     );
   }
 
@@ -50,6 +53,7 @@ class Post {
       authorName: authorName,
       createdAt: createdAt,
       text: text,
+      imagePath: imagePath,
       imageUrl: imageUrl ?? this.imageUrl,
       likeCount: likeCount ?? this.likeCount,
       likedByMe: likedByMe ?? this.likedByMe,
@@ -61,12 +65,14 @@ class Post {
 class Comment {
   const Comment({
     required this.id,
+    required this.authorId,
     required this.authorName,
     required this.text,
     required this.createdAt,
   });
 
   final String id;
+  final String authorId;
   final String authorName;
   final String text;
   final DateTime createdAt;
@@ -74,6 +80,7 @@ class Comment {
   factory Comment.fromRow(Map<String, dynamic> row) {
     return Comment(
       id: row['id'] as String,
+      authorId: row['author_id'] as String,
       authorName: (row['author'] as Map<String, dynamic>)['name'] as String,
       text: row['text'] as String,
       createdAt: DateTime.parse(row['created_at'] as String),
@@ -207,6 +214,20 @@ class FeedRepository {
       'author_id': authorId,
       'text': text,
     });
+  }
+
+  /// Deletes a post the current user owns. Comments/reactions cascade via
+  /// their FK to `posts`, but the photo lives in Storage, not Postgres, so
+  /// it's removed separately.
+  Future<void> deletePost({required String postId, String? imagePath}) async {
+    if (imagePath != null) {
+      await _client.storage.from(_bucket).remove([imagePath]);
+    }
+    await _client.from('posts').delete().eq('id', postId);
+  }
+
+  Future<void> deleteComment(String commentId) async {
+    await _client.from('comments').delete().eq('id', commentId);
   }
 }
 

@@ -44,12 +44,14 @@ void main() {
     test('parses a comment row', () {
       final comment = Comment.fromRow({
         'id': 'comment-1',
+        'author_id': 'user-2',
         'author': {'name': 'Bob'},
         'text': 'Nice post!',
         'created_at': '2026-01-01T12:00:00Z',
       });
 
       expect(comment.id, 'comment-1');
+      expect(comment.authorId, 'user-2');
       expect(comment.authorName, 'Bob');
       expect(comment.text, 'Nice post!');
     });
