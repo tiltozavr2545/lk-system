@@ -11,6 +11,7 @@ import 'features/auth/sign_up_screen.dart';
 import 'features/connections/connections_screen.dart';
 import 'features/feed/feed_screen.dart';
 import 'features/profile/profile_screen.dart';
+import 'features/shell/main_shell_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authChanges = ref.watch(supabaseClientProvider).auth.onAuthStateChange;
@@ -33,14 +34,35 @@ final routerProvider = Provider<GoRouter>((ref) {
       );
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const FeedScreen()),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: '/connections',
-        builder: (context, state) => const ConnectionsScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShellScreen(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const FeedScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/connections',
+                builder: (context, state) => const ConnectionsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '/sign-in',

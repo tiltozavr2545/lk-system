@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 
 import '../auth/auth_providers.dart';
 import 'comments_screen.dart';
-import 'create_post_screen.dart';
 import 'feed_repository.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -162,31 +161,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // A post created from the bottom-nav "new post" tab bumps this counter
+    // (FeedScreen no longer owns the create-post entry point itself).
+    ref.listen<int>(feedRefreshTickProvider, (previous, next) {
+      if (previous != null) _refresh();
+    });
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Amicus'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.people_outline),
-            tooltip: 'Знакомства',
-            onPressed: () => context.push('/connections'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            tooltip: 'Профиль',
-            onPressed: () => context.push('/profile'),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final created = await Navigator.of(context).push<bool>(
-            MaterialPageRoute(builder: (_) => const CreatePostScreen()),
-          );
-          if (created == true) _refresh();
-        },
-        child: const Icon(Icons.add),
-      ),
+      appBar: AppBar(title: const Text('Amicus')),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: _posts.isEmpty && !_isLoading
@@ -208,7 +190,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                           ),
                           const SizedBox(height: 16),
                           OutlinedButton(
-                            onPressed: () => context.push('/connections'),
+                            onPressed: () => context.go('/connections'),
                             child: const Text('Добавить знакомых'),
                           ),
                         ],
