@@ -14,11 +14,19 @@ void main() {
     test('leaves a logged-out user on an auth screen alone', () {
       expect(computeRedirect(loggedIn: false, location: '/sign-in'), null);
       expect(computeRedirect(loggedIn: false, location: '/sign-up'), null);
+      expect(
+        computeRedirect(loggedIn: false, location: '/forgot-password'),
+        null,
+      );
     });
 
     test('sends a logged-in user away from an auth screen', () {
       expect(computeRedirect(loggedIn: true, location: '/sign-in'), '/');
       expect(computeRedirect(loggedIn: true, location: '/sign-up'), '/');
+      expect(
+        computeRedirect(loggedIn: true, location: '/forgot-password'),
+        '/',
+      );
     });
 
     test('leaves a logged-in user on a non-auth screen alone', () {

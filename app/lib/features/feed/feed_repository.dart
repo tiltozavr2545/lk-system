@@ -291,3 +291,16 @@ class FeedRepository {
 final feedRepositoryProvider = Provider<FeedRepository>((ref) {
   return FeedRepository(ref.watch(supabaseClientProvider));
 });
+
+/// Bumped by the bottom-nav shell after a post is created from outside
+/// [FeedScreen] (the "new post" tab), so the feed knows to refresh itself.
+class FeedRefreshTick extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void bump() => state++;
+}
+
+final feedRefreshTickProvider = NotifierProvider<FeedRefreshTick, int>(
+  FeedRefreshTick.new,
+);
