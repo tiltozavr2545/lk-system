@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'features/auth/auth_providers.dart';
+import 'features/auth/forgot_password_screen.dart';
 import 'features/auth/sign_in_screen.dart';
 import 'features/auth/sign_up_screen.dart';
 import 'features/connections/connections_screen.dart';
@@ -49,6 +50,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/sign-up',
         builder: (context, state) => const SignUpScreen(),
       ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
     ],
   );
 });
@@ -57,7 +62,10 @@ final routerProvider = Provider<GoRouter>((ref) {
 /// function so the decision table can be unit tested without a router,
 /// Supabase client, or BuildContext.
 String? computeRedirect({required bool loggedIn, required String location}) {
-  final onAuthScreen = location == '/sign-in' || location == '/sign-up';
+  final onAuthScreen =
+      location == '/sign-in' ||
+      location == '/sign-up' ||
+      location == '/forgot-password';
   if (!loggedIn && !onAuthScreen) return '/sign-in';
   if (loggedIn && onAuthScreen) return '/';
   return null;

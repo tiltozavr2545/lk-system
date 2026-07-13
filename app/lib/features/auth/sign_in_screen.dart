@@ -90,6 +90,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               onPressed: () => context.go('/sign-up'),
               child: const Text('Нет аккаунта? Зарегистрироваться'),
             ),
+            TextButton(
+              onPressed: () => context.go('/forgot-password'),
+              child: const Text('Забыли пароль?'),
+            ),
           ],
         ),
       ),
