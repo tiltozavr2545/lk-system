@@ -139,6 +139,51 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get muteFriendTooltip => 'Заглушить';
+
+  @override
+  String get unmuteFriendTooltip => 'Включить обратно';
+
+  @override
+  String muteFriendTitle(String name) {
+    return 'Заглушить $name?';
+  }
+
+  @override
+  String get muteFriendContent =>
+      'Их посты перестанут показываться в вашей ленте. Знакомство не разорвётся.';
+
+  @override
+  String get muteButton => 'Заглушить';
+
+  @override
+  String get blockFriendTooltip => 'Заблокировать';
+
+  @override
+  String blockFriendTitle(String name) {
+    return 'Заблокировать $name?';
+  }
+
+  @override
+  String get blockFriendContent =>
+      'Ни вы, ни он не будете видеть посты друг друга. Знакомство не разорвётся.';
+
+  @override
+  String get blockButton => 'Заблокировать';
+
+  @override
+  String get unblockButton => 'Разблокировать';
+
+  @override
+  String get blockedUsersTooltip => 'Заблокированные';
+
+  @override
+  String get blockedUsersTitle => 'Заблокированные';
+
+  @override
+  String get noBlockedUsersMessage => 'Вы никого не заблокировали';
+
+  @override
   String get publishButton => 'Опубликовать';
 
   @override

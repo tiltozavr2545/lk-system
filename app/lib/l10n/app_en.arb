@@ -62,6 +62,27 @@
     "placeholders": { "name": { "type": "String" } }
   },
 
+  "muteFriendTooltip": "Mute",
+  "unmuteFriendTooltip": "Unmute",
+  "muteFriendTitle": "Mute {name}?",
+  "@muteFriendTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "muteFriendContent": "You won't see their posts in your feed. You'll still be connected.",
+  "muteButton": "Mute",
+
+  "blockFriendTooltip": "Block",
+  "blockFriendTitle": "Block {name}?",
+  "@blockFriendTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "blockFriendContent": "Neither of you will see each other's posts. You'll still be connected.",
+  "blockButton": "Block",
+  "unblockButton": "Unblock",
+  "blockedUsersTooltip": "Blocked users",
+  "blockedUsersTitle": "Blocked",
+  "noBlockedUsersMessage": "You haven't blocked anyone",
+
   "publishButton": "Publish",
   "whatsNewHint": "What's new?",
   "addPhotoButton": "Add photo",

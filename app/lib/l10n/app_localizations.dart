@@ -332,6 +332,84 @@ abstract class AppLocalizations {
   /// **'You\'re now connected with {name}'**
   String nowConnectedWithMessage(String name);
 
+  /// No description provided for @muteFriendTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get muteFriendTooltip;
+
+  /// No description provided for @unmuteFriendTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get unmuteFriendTooltip;
+
+  /// No description provided for @muteFriendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute {name}?'**
+  String muteFriendTitle(String name);
+
+  /// No description provided for @muteFriendContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t see their posts in your feed. You\'ll still be connected.'**
+  String get muteFriendContent;
+
+  /// No description provided for @muteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get muteButton;
+
+  /// No description provided for @blockFriendTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get blockFriendTooltip;
+
+  /// No description provided for @blockFriendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Block {name}?'**
+  String blockFriendTitle(String name);
+
+  /// No description provided for @blockFriendContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Neither of you will see each other\'s posts. You\'ll still be connected.'**
+  String get blockFriendContent;
+
+  /// No description provided for @blockButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get blockButton;
+
+  /// No description provided for @unblockButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get unblockButton;
+
+  /// No description provided for @blockedUsersTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked users'**
+  String get blockedUsersTooltip;
+
+  /// No description provided for @blockedUsersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get blockedUsersTitle;
+
+  /// No description provided for @noBlockedUsersMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t blocked anyone'**
+  String get noBlockedUsersMessage;
+
   /// No description provided for @publishButton.
   ///
   /// In en, this message translates to:

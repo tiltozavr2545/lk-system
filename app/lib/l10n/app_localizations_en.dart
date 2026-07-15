@@ -139,6 +139,51 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get muteFriendTooltip => 'Mute';
+
+  @override
+  String get unmuteFriendTooltip => 'Unmute';
+
+  @override
+  String muteFriendTitle(String name) {
+    return 'Mute $name?';
+  }
+
+  @override
+  String get muteFriendContent =>
+      'You won\'t see their posts in your feed. You\'ll still be connected.';
+
+  @override
+  String get muteButton => 'Mute';
+
+  @override
+  String get blockFriendTooltip => 'Block';
+
+  @override
+  String blockFriendTitle(String name) {
+    return 'Block $name?';
+  }
+
+  @override
+  String get blockFriendContent =>
+      'Neither of you will see each other\'s posts. You\'ll still be connected.';
+
+  @override
+  String get blockButton => 'Block';
+
+  @override
+  String get unblockButton => 'Unblock';
+
+  @override
+  String get blockedUsersTooltip => 'Blocked users';
+
+  @override
+  String get blockedUsersTitle => 'Blocked';
+
+  @override
+  String get noBlockedUsersMessage => 'You haven\'t blocked anyone';
+
+  @override
   String get publishButton => 'Publish';
 
   @override

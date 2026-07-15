@@ -47,6 +47,21 @@
   "noConnectionsYetMessage": "Пока нет знакомых — активируй код или создай свой выше",
   "nowConnectedWithMessage": "Вы теперь знакомы с {name}",
 
+  "muteFriendTooltip": "Заглушить",
+  "unmuteFriendTooltip": "Включить обратно",
+  "muteFriendTitle": "Заглушить {name}?",
+  "muteFriendContent": "Их посты перестанут показываться в вашей ленте. Знакомство не разорвётся.",
+  "muteButton": "Заглушить",
+
+  "blockFriendTooltip": "Заблокировать",
+  "blockFriendTitle": "Заблокировать {name}?",
+  "blockFriendContent": "Ни вы, ни он не будете видеть посты друг друга. Знакомство не разорвётся.",
+  "blockButton": "Заблокировать",
+  "unblockButton": "Разблокировать",
+  "blockedUsersTooltip": "Заблокированные",
+  "blockedUsersTitle": "Заблокированные",
+  "noBlockedUsersMessage": "Вы никого не заблокировали",
+
   "publishButton": "Опубликовать",
   "whatsNewHint": "Что нового?",
   "addPhotoButton": "Добавить фото",
